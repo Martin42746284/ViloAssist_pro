@@ -98,38 +98,9 @@ const Header = () => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center space-x-3">
-            {/* Admin Access */}
-            {isAdmin && (
-              <Link to="/admin">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-vilo-purple-300 dark:border-vilo-purple-400 text-vilo-purple-600 dark:text-vilo-purple-400 hover:bg-vilo-purple-50 dark:hover:bg-vilo-purple-900/20"
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
-            )}
-
-            <ThemeToggle />
-            
-            {user ? <UserMenu /> : (
-              <Link to="/auth">
-               
-              </Link>
-            )}
-          </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center space-x-3 lg:hidden">
-            <ThemeToggle />
-            {user ? <UserMenu /> : (
-              <Link to="/auth">
-                
-              </Link>
-            )}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 text-gray-700 dark:text-gray-300 hover:text-vilo-purple-600 dark:hover:text-vilo-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -154,16 +125,6 @@ const Header = () => {
               ))}
               
               {/* Mobile Admin Access */}
-              {isAdmin && (
-                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
-                  <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                    <div className="flex items-center px-4 py-3 text-base font-medium text-vilo-purple-600 dark:text-vilo-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
-                      <Shield className="w-5 h-5 mr-3" />
-                      Dashboard Admin
-                    </div>
-                  </Link>
-                </div>
-              )}
             </nav>
           </div>
         )}
