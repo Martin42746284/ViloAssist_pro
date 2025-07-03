@@ -40,6 +40,7 @@ const AdminDashboard = () => {
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [retryCount, setRetryCount] = useState(0);
+  const [confirmedEmails, setConfirmedEmails] = useState<Record<string, boolean>>({});
 
   // Surveillance de la connexion
   useEffect(() => {
@@ -161,6 +162,25 @@ const AdminDashboard = () => {
       setAppointments(validatedAppointments);
       setLastSyncTime(Date.now());
 
+      // Initialiser confirmedEmails avec les emails déjà confirmés
+      const confirmedEmailsMap: Record<string, boolean> = {};
+      
+      // Pour les contacts
+      validatedContacts.forEach((contact: Contact) => {
+        if (contact.status === 'traité' || contact.status === 'fermé') {
+          confirmedEmailsMap[contact.email] = true;
+        }
+      });
+
+      // Pour les rendez-vous
+      validatedAppointments.forEach((appointment: Appointment) => {
+        if (appointment.status === 'confirmé' || appointment.status === 'terminé') {
+          confirmedEmailsMap[appointment.client_email] = true;
+        }
+      });
+
+      setConfirmedEmails(confirmedEmailsMap);
+
       const duration = Date.now() - startTime;
       console.log(`Données chargées en ${duration}ms - Contacts: ${validatedContacts.length}, Rendez-vous: ${validatedAppointments.length}`);
 
@@ -266,6 +286,12 @@ const AdminDashboard = () => {
       if (!response.success) {
         throw new Error(response.message || "Erreur inconnue du serveur");
       }
+
+      // Mettre à jour l'état des emails confirmés
+      setConfirmedEmails(prev => ({
+        ...prev,
+        [email]: true
+      }));
 
       toast({
         title: "Email envoyé",
@@ -448,24 +474,6 @@ const AdminDashboard = () => {
     );
   };
 
-  if (isLoading && contacts.length === 0 && appointments.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vilo-purple-600 mx-auto mb-4"></div>
-              <p className="text-gray-600 dark:text-gray-400">
-                Chargement des données...
-                {retryCount > 0 && ` (Tentative ${retryCount + 1})`}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const renderContactActions = (contact: Contact) => (
     <div className="flex flex-wrap gap-2">
       {contact.status === 'nouveau' && (
@@ -495,10 +503,11 @@ const AdminDashboard = () => {
           service: contact.service,
           message: contact.message
         })}
+        disabled={confirmedEmails[contact.email]}
         className="border-vilo-purple-300 text-vilo-purple-600 hover:bg-vilo-purple-50 dark:border-vilo-purple-400 dark:text-vilo-purple-400 dark:hover:bg-vilo-purple-900/20"
       >
         <Send className="w-4 h-4 mr-1" />
-        Envoyer email
+        {confirmedEmails[contact.email] ? "Contact déjà confirmé" : "Envoyer email"}
       </Button>
     </div>
   );
@@ -540,13 +549,32 @@ const AdminDashboard = () => {
           date: new Date(appointment.date).toLocaleDateString('fr-FR'),
           time: appointment.time
         })}
+        disabled={confirmedEmails[appointment.client_email]}
         className="border-vilo-purple-300 text-vilo-purple-600 hover:bg-vilo-purple-50 dark:border-vilo-purple-400 dark:text-vilo-purple-400 dark:hover:bg-vilo-purple-900/20"
       >
         <Send className="w-4 h-4 mr-1" />
-        Envoyer email
+        {confirmedEmails[appointment.client_email] ? "Rendez-vous déjà confirmé" : "Envoyer email"}
       </Button>
     </div>
   );
+
+  if (isLoading && contacts.length === 0 && appointments.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vilo-purple-600 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">
+                Chargement des données...
+                {retryCount > 0 && ` (Tentative ${retryCount + 1})`}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
