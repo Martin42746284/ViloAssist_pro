@@ -23,7 +23,17 @@ import {
   Shield,
   AlertCircle,
   Wifi,
-  WifiOff
+  WifiOff,
+  Users,
+  CalendarDays,
+  TrendingUp,
+  Activity,
+  X,
+  ChevronDown,
+  MessageSquare,
+  Plus,
+  Settings,
+  BarChart3
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { debounce } from 'lodash';
@@ -36,7 +46,7 @@ const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState('contacts');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [lastSyncTime, setLastSyncTime] = useState<number | null>(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [retryCount, setRetryCount] = useState(0);
@@ -120,7 +130,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const fetchData = async (options: { forceRefresh?: boolean } = {}) => {
+   const fetchData = async (options: { forceRefresh?: boolean } = {}) => {
     const { forceRefresh = false } = options;
 
     if (!isOnline) {
@@ -239,7 +249,7 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  // Auto-refresh des données toutes les 5 minutes
+   // Auto-refresh des données toutes les 5 minutes
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
@@ -312,7 +322,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Helper functions
+    // Helper functions
   const buildEmailText = (type: string, data: any): string => {
     // Implémentez la version texte ici
     return type === 'contact' 
@@ -413,19 +423,21 @@ const AdminDashboard = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      nouveau: { color: 'bg-blue-500 hover:bg-blue-600', text: 'Nouveau' },
-      traité: { color: 'bg-yellow-500 hover:bg-yellow-600', text: 'Traité' },
-      fermé: { color: 'bg-green-500 hover:bg-green-600', text: 'Fermé' },
-      en_attente: { color: 'bg-orange-500 hover:bg-orange-600', text: 'En attente' },
-      confirmé: { color: 'bg-green-500 hover:bg-green-600', text: 'Confirmé' },
-      annulé: { color: 'bg-red-500 hover:bg-red-600', text: 'Annulé' },
-      terminé: { color: 'bg-gray-500 hover:bg-gray-600', text: 'Terminé' },
+      nouveau: { color: 'bg-blue-100 text-blue-800 border-blue-200', text: 'Nouveau', icon: Plus },
+      traité: { color: 'bg-yellow-100 text-yellow-800 border-yellow-200', text: 'Traité', icon: Eye },
+      fermé: { color: 'bg-green-100 text-green-800 border-green-200', text: 'Fermé', icon: CheckCircle },
+      en_attente: { color: 'bg-orange-100 text-orange-800 border-orange-200', text: 'En attente', icon: Clock },
+      confirmé: { color: 'bg-green-100 text-green-800 border-green-200', text: 'Confirmé', icon: CheckCircle },
+      annulé: { color: 'bg-red-100 text-red-800 border-red-200', text: 'Annulé', icon: X },
+      terminé: { color: 'bg-gray-100 text-gray-800 border-gray-200', text: 'Terminé', icon: CheckCircle },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || { color: 'bg-gray-500', text: status };
+    const config = statusConfig[status as keyof typeof statusConfig] || { color: 'bg-gray-100 text-gray-800 border-gray-200', text: status, icon: Activity };
+    const IconComponent = config.icon;
 
     return (
-      <Badge className={`${config.color} text-white transition-colors`}>
+      <Badge className={`${config.color} border font-medium px-3 py-1 rounded-full flex items-center gap-1`}>
+        <IconComponent className="w-3 h-3" />
         {config.text}
       </Badge>
     );
@@ -442,7 +454,8 @@ const AdminDashboard = () => {
     return contacts.filter(contact => {
       const matchesSearch = contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            contact.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           contact.service.toLowerCase().includes(searchTerm.toLowerCase());
+                           contact.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           contact.message.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'all' || contact.status === statusFilter;
       return matchesSearch && matchesStatus;
     });
@@ -456,6 +469,23 @@ const AdminDashboard = () => {
       return matchesSearch && matchesStatus;
     });
   }, [appointments, searchTerm, statusFilter]);
+
+  // Statistiques pour le dashboard
+  const stats = useMemo(() => {
+    const totalContacts = contacts.length;
+    const newContacts = contacts.filter(c => c.status === 'nouveau').length;
+    const totalAppointments = appointments.length;
+    const pendingAppointments = appointments.filter(a => a.status === 'en_attente').length;
+    
+    return {
+      totalContacts,
+      newContacts,
+      totalAppointments,
+      pendingAppointments,
+      contactsProcessed: contacts.filter(c => c.status === 'traité').length,
+      appointmentsConfirmed: appointments.filter(a => a.status === 'confirmé').length
+    };
+  }, [contacts, appointments]);
 
   // Indicateur de fraîcheur des données
   const getDataFreshnessIndicator = () => {
@@ -473,6 +503,31 @@ const AdminDashboard = () => {
       </div>
     );
   };
+
+  if (isLoading && contacts.length === 0 && appointments.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600 mx-auto mb-4"></div>
+                <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-transparent border-r-cyan-400 animate-spin mx-auto" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+              </div>
+              <p className="text-gray-600 text-lg font-medium">
+                Chargement des données...
+              </p>
+              {retryCount > 0 && (
+                <p className="text-sm text-gray-500 mt-2">
+                  Tentative {retryCount + 1}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const renderContactActions = (contact: Contact) => (
     <div className="flex flex-wrap gap-2">
@@ -558,7 +613,7 @@ const AdminDashboard = () => {
     </div>
   );
 
-  if (isLoading && contacts.length === 0 && appointments.length === 0) {
+    if (isLoading && contacts.length === 0 && appointments.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
         <div className="max-w-7xl mx-auto">
@@ -577,69 +632,269 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Tableau de bord Admin</h1>
-          <div className="flex items-center space-x-4">
-            {getDataFreshnessIndicator()}
-            <Button
-              onClick={refreshData}
-              disabled={isRefreshing}
-              className="bg-vilo-purple-600 hover:bg-vilo-purple-700 text-white"
-            >
-              {isRefreshing ? 'Actualisation...' : 'Actualiser'}
-            </Button>
-            <Button onClick={logout} variant="destructive">
-              Déconnexion
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  Dashboard Admin
+                </h1>
+                <p className="text-gray-600 text-sm">Gérez vos contacts et rendez-vous</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              {getDataFreshnessIndicator()}
+              <Button
+                onClick={refreshData}
+                disabled={isRefreshing}
+                className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0 shadow-md hover:shadow-lg transition-all"
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Actualisation...' : 'Actualiser'}
+              </Button>
+              <Button 
+                onClick={logout} 
+                variant="outline"
+                className="border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Déconnexion
+              </Button>
+            </div>
           </div>
         </div>
+      </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="contacts">Contacts</TabsTrigger>
-            <TabsTrigger value="appointments">Rendez-vous</TabsTrigger>
+      <div className="max-w-7xl mx-auto p-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="bg-white p-1 rounded-xl shadow-sm border border-gray-200">
+            <TabsTrigger 
+              value="dashboard" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg px-6 py-3 font-medium transition-all"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Vue d'ensemble
+            </TabsTrigger>
+            <TabsTrigger 
+              value="contacts"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg px-6 py-3 font-medium transition-all"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Contacts ({contacts.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="appointments"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-lg px-6 py-3 font-medium transition-all"
+            >
+              <CalendarDays className="w-4 h-4 mr-2" />
+              Rendez-vous ({appointments.length})
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="contacts">
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle>Contacts</CardTitle>
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                  <Input
-                    type="search"
-                    placeholder="Rechercher..."
-                    onChange={(e) => debouncedSetSearchTerm(e.target.value)}
-                    className="flex-grow"
-                  />
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-100"
-                  >
-                    <option value="all">Tous</option>
-                    <option value="nouveau">Nouveau</option>
-                    <option value="traité">Traité</option>
-                    <option value="fermé">Fermé</option>
-                  </select>
+          {/* Dashboard Overview */}
+          <TabsContent value="dashboard" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200 shadow-md hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-blue-600">Total Contacts</p>
+                      <p className="text-3xl font-bold text-blue-800">{stats.totalContacts}</p>
+                    </div>
+                    <div className="p-3 bg-blue-500 rounded-full">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-50 to-yellow-100 border-orange-200 shadow-md hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-orange-600">Nouveaux</p>
+                      <p className="text-3xl font-bold text-orange-800">{stats.newContacts}</p>
+                    </div>
+                    <div className="p-3 bg-orange-500 rounded-full">
+                      <Plus className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-200 shadow-md hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-green-600">Rendez-vous</p>
+                      <p className="text-3xl font-bold text-green-800">{stats.totalAppointments}</p>
+                    </div>
+                    <div className="p-3 bg-green-500 rounded-full">
+                      <CalendarDays className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-purple-50 to-pink-100 border-purple-200 shadow-md hover:shadow-lg transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-purple-600">En attente</p>
+                      <p className="text-3xl font-bold text-purple-800">{stats.pendingAppointments}</p>
+                    </div>
+                    <div className="p-3 bg-purple-500 rounded-full">
+                      <Clock className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Activité récente */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-white shadow-md hover:shadow-lg transition-all border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
+                    <Activity className="w-5 h-5 mr-2 text-indigo-600" />
+                    Contacts récents
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {contacts.slice(0, 3).map(contact => (
+                    <div key={contact.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <User className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">{contact.name}</p>
+                          <p className="text-sm text-gray-600">{contact.service}</p>
+                        </div>
+                      </div>
+                      {getStatusBadge(contact.status)}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white shadow-md hover:shadow-lg transition-all border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
+                    <Calendar className="w-5 h-5 mr-2 text-indigo-600" />
+                    Prochains rendez-vous
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {appointments.slice(0, 3).map(appointment => (
+                    <div key={appointment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                          <CalendarDays className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">{appointment.client_name}</p>
+                          <p className="text-sm text-gray-600">{new Date(appointment.date).toLocaleDateString('fr-FR')} à {appointment.time}</p>
+                        </div>
+                      </div>
+                      {getStatusBadge(appointment.status)}
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="contacts" className="space-y-6">
+            <Card className="bg-white shadow-md border-0">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                  <CardTitle className="text-2xl font-semibold text-gray-800 flex items-center">
+                    <Users className="w-6 h-6 mr-3 text-indigo-600" />
+                    Gestion des contacts
+                  </CardTitle>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="relative">
+                      <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <Input
+                        type="search"
+                        placeholder="Rechercher un contact..."
+                        onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+                        className="pl-10 w-full sm:w-80 bg-gray-50 border-gray-200 focus:bg-white focus:border-indigo-300 focus:ring-indigo-200 transition-all"
+                      />
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="appearance-none bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 pr-8 focus:bg-white focus:border-indigo-300 focus:ring-indigo-200 transition-all"
+                      >
+                        <option value="all">Tous les statuts</option>
+                        <option value="nouveau">Nouveau</option>
+                        <option value="traité">Traité</option>
+                        <option value="fermé">Fermé</option>
+                      </select>
+                      <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredContacts.map(contact => (
-                    <div key={contact.id} className="border dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-700 hover:shadow-md transition-shadow">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{contact.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{contact.email}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{contact.service}</p>
-                      {getStatusBadge(contact.status)}
-                      <div className="mt-3">{renderContactActions(contact)}</div>
+                    <div key={contact.id} className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-indigo-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                            <User className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-800">{contact.name}</h3>
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <Mail className="w-4 h-4 mr-1" />
+                              {contact.email}
+                            </p>
+                          </div>
+                        </div>
+                        {getStatusBadge(contact.status)}
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <p className="text-sm text-gray-700 flex items-center">
+                          <Settings className="w-4 h-4 mr-2 text-gray-500" />
+                          <span className="font-medium">Service:</span> {contact.service}
+                        </p>
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p className="text-sm text-gray-600 flex items-start">
+                            <MessageSquare className="w-4 h-4 mr-2 text-gray-500 mt-0.5" />
+                            <span>{contact.message}</span>
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {renderContactActions(contact)}
                     </div>
                   ))}
                   {filteredContacts.length === 0 && (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400 col-span-full">
-                      {contacts.length === 0 ? 'Aucun contact à afficher' : 'Aucun contact trouvé avec ces filtres'}
+                    <div className="col-span-full text-center py-12">
+                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Users className="w-12 h-12 text-gray-400" />
+                      </div>
+                      <p className="text-xl font-medium text-gray-600 mb-2">
+                        {contacts.length === 0 ? 'Aucun contact' : 'Aucun résultat'}
+                      </p>
+                      <p className="text-gray-500">
+                        {contacts.length === 0 
+                          ? 'Les nouveaux contacts apparaîtront ici' 
+                          : 'Essayez de modifier vos critères de recherche'}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -647,46 +902,89 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="appointments">
-            <Card className="dark:bg-gray-800 dark:border-gray-700">
-              <CardHeader>
-                <CardTitle>Rendez-vous</CardTitle>
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                  <Input
-                    type="search"
-                    placeholder="Rechercher..."
-                    onChange={(e) => debouncedSetSearchTerm(e.target.value)}
-                    className="flex-grow"
-                  />
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border rounded px-2 py-1 dark:bg-gray-700 dark:text-gray-100"
-                  >
-                    <option value="all">Tous</option>
-                    <option value="en_attente">En attente</option>
-                    <option value="confirmé">Confirmé</option>
-                    <option value="annulé">Annulé</option>
-                    <option value="terminé">Terminé</option>
-                  </select>
+          <TabsContent value="appointments" className="space-y-6">
+            <Card className="bg-white shadow-md border-0">
+              <CardHeader className="pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+                  <CardTitle className="text-2xl font-semibold text-gray-800 flex items-center">
+                    <CalendarDays className="w-6 h-6 mr-3 text-indigo-600" />
+                    Gestion des rendez-vous
+                  </CardTitle>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <div className="relative">
+                      <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <Input
+                        type="search"
+                        placeholder="Rechercher un rendez-vous..."
+                        onChange={(e) => debouncedSetSearchTerm(e.target.value)}
+                        className="pl-10 w-full sm:w-80 bg-gray-50 border-gray-200 focus:bg-white focus:border-indigo-300 focus:ring-indigo-200 transition-all"
+                      />
+                    </div>
+                    <div className="relative">
+                      <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="appearance-none bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 pr-8 focus:bg-white focus:border-indigo-300 focus:ring-indigo-200 transition-all"
+                      >
+                        <option value="all">Tous les statuts</option>
+                        <option value="en_attente">En attente</option>
+                        <option value="confirmé">Confirmé</option>
+                        <option value="annulé">Annulé</option>
+                        <option value="terminé">Terminé</option>
+                      </select>
+                      <ChevronDown className="w-4 h-4 absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
                 </div>
               </CardHeader>
 
               <CardContent>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                   {filteredAppointments.map(appointment => (
-                    <div key={appointment.id} className="border dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-700 hover:shadow-md transition-shadow">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">{appointment.client_name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{appointment.client_email}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{new Date(appointment.date).toLocaleDateString('fr-FR')}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{appointment.time}</p>
-                      {getStatusBadge(appointment.status)}
-                      <div className="mt-3">{renderAppointmentActions(appointment)}</div>
+                    <div key={appointment.id} className="bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-indigo-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                            <CalendarDays className="w-6 h-6 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-gray-800">{appointment.client_name}</h3>
+                            <p className="text-sm text-gray-600 flex items-center">
+                              <Mail className="w-4 h-4 mr-1" />
+                              {appointment.client_email}
+                            </p>
+                          </div>
+                        </div>
+                        {getStatusBadge(appointment.status)}
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <p className="text-sm text-gray-700 flex items-center">
+                          <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                          <span className="font-medium">Date:</span> {new Date(appointment.date).toLocaleDateString('fr-FR')}
+                        </p>
+                        <p className="text-sm text-gray-700 flex items-center">
+                          <Clock className="w-4 h-4 mr-2 text-gray-500" />
+                          <span className="font-medium">Heure:</span> {appointment.time}
+                        </p>
+                      </div>
+                      
+                      {renderAppointmentActions(appointment)}
                     </div>
                   ))}
                   {filteredAppointments.length === 0 && (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400 col-span-full">
-                      {appointments.length === 0 ? 'Aucun rendez-vous à afficher' : 'Aucun rendez-vous trouvé avec ces filtres'}
+                    <div className="col-span-full text-center py-12">
+                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CalendarDays className="w-12 h-12 text-gray-400" />
+                      </div>
+                      <p className="text-xl font-medium text-gray-600 mb-2">
+                        {appointments.length === 0 ? 'Aucun rendez-vous' : 'Aucun résultat'}
+                      </p>
+                      <p className="text-gray-500">
+                        {appointments.length === 0 
+                          ? 'Les nouveaux rendez-vous apparaîtront ici' 
+                          : 'Essayez de modifier vos critères de recherche'}
+                      </p>
                     </div>
                   )}
                 </div>

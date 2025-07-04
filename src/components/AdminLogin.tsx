@@ -66,7 +66,7 @@ const AdminLogin = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@viloassist.com"
+                  placeholder="Email"
                   className="pl-10 h-12 border-gray-200 dark:border-gray-600 focus:border-vilo-purple-500 dark:focus:border-vilo-purple-400"
                   required
                 />
@@ -84,7 +84,7 @@ const AdminLogin = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Mot de passe"
                   className="pl-10 pr-10 h-12 border-gray-200 dark:border-gray-600 focus:border-vilo-purple-500 dark:focus:border-vilo-purple-400"
                   required
                 />
@@ -113,12 +113,12 @@ const AdminLogin = () => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          {/* Demonstration */}
+          {/* <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-xs text-blue-600 dark:text-blue-400 text-center">
               <strong>Démo:</strong> admin@viloassist.com / admin123
             </p>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
