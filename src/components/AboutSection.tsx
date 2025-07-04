@@ -272,9 +272,9 @@ const AboutSection = () => {
                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-purple-500/0 to-pink-500/0 group-hover:from-purple-500/30 group-hover:to-pink-500/30 transition-all duration-300"></div>
               </div>
             ))}
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg border-4 border-purple-400">
+            {/* <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center text-white font-bold shadow-lg border-4 border-purple-400">
               +6
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -374,7 +374,7 @@ const AboutSection = () => {
                 combinant proximité culturelle francophone et excellence technique.
               </p>
               
-              <div className="flex justify-center mt-8 space-x-4">
+              {/* <div className="flex justify-center mt-8 space-x-4">
                 <div className="px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/30 hover:bg-white/20 transition-all duration-300 cursor-pointer">
                   <span className="text-cyan-300 font-medium">🌍 International</span>
                 </div>
@@ -384,7 +384,7 @@ const AboutSection = () => {
                 <div className="px-6 py-3 bg-white/10 backdrop-blur-sm rounded-full border border-white/30 hover:bg-white/20 transition-all duration-300 cursor-pointer">
                   <span className="text-purple-300 font-medium">⚡ 24/7</span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
