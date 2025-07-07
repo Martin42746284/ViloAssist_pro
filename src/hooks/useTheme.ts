@@ -1,27 +1,22 @@
-
 import { useState, useEffect } from 'react';
 
 export const useTheme = () => {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' || 
-             (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-    return false;
-  });
+  const [isDark] = useState(true); // Toujours en mode sombre
 
   useEffect(() => {
+    // Forcer le mode sombre au chargement
     const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    root.classList.add('dark');
+    root.classList.remove('light');
+    
+    // Supprimer le localStorage pour éviter les conflits
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('theme');
     }
-  }, [isDark]);
+  }, []);
 
-  const toggleTheme = () => setIsDark(!isDark);
-
-  return { isDark, toggleTheme };
+  return { 
+    isDark: true, // Toujours vrai
+    toggleTheme: () => {} // Fonction vide car plus de toggle nécessaire
+  };
 };

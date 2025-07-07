@@ -98,34 +98,8 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden lg:flex items-center space-x-3">
-            {/* Admin Access */}
-            {/* {isAdmin && (
-              <Link to="/admin">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-vilo-purple-300 dark:border-vilo-purple-400 text-vilo-purple-600 dark:text-vilo-purple-400 hover:bg-vilo-purple-50 dark:hover:bg-vilo-purple-900/20"
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Admin
-                </Button>
-              </Link>
-            )} */}
-
-            <ThemeToggle />
-            
-            {/* {user ? <UserMenu /> : (
-              <Link to="/auth">
-               
-              </Link>
-            )} */}
-          </div>
-
           {/* Mobile Menu Button */}
           <div className="flex items-center space-x-3 lg:hidden">
-            <ThemeToggle />
             {/* {user ? <UserMenu /> : (
               <Link to="/auth">
                 
