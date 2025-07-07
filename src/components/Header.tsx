@@ -69,7 +69,8 @@ const Header = () => {
           <Link to="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl flex items-center justify-center transform transition-transform group-hover:scale-105">
-                <Sparkles className="w-6 h-6 text-white" />
+                <img src="../public/favicon.ico" alt="" />
+                {/* <Sparkles className="w-6 h-6 text-white" /> */}
               </div>
               <div className="absolute -inset-1 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
             </div>
