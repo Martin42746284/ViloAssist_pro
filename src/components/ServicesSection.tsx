@@ -23,84 +23,84 @@ const ServicesSection = () => {
 
   const services = [
     {
-      icon: "📄",
+      icon: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=150&h=150&fit=crop&crop=center",
       gradient: "from-blue-400 to-blue-600",
       backgroundImage: "https://picsum.photos/400/300?random=1",
       title: "Assistant administratif",
       description: "Gestion de vos tâches administratives quotidiennes avec rigueur et efficacité."
     },
     {
-      icon: "💼",
+      icon: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=150&h=150&fit=crop&crop=center",
       gradient: "from-indigo-400 to-purple-600",
       backgroundImage: "https://picsum.photos/400/300?random=2",
       title: "Assistant polyvalent",
       description: "Support complet pour diverses missions selon vos besoins spécifiques."
     },
     {
-      icon: "✅",
+      icon: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=150&h=150&fit=crop&crop=center",
       gradient: "from-green-400 to-emerald-600",
       backgroundImage: "https://picsum.photos/400/300?random=3",
       title: "Assistant recrutement",
       description: "Accompagnement dans vos processus de recrutement et sélection de candidats."
     },
     {
-      icon: "🏨",
+      icon: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=150&h=150&fit=crop&crop=center",
       gradient: "from-amber-400 to-orange-600",
       backgroundImage: "https://picsum.photos/400/300?random=4",
       title: "Assistant virtuel en conciergerie",
       description: "Services de conciergerie personnalisés pour vos clients et partenaires."
     },
     {
-      icon: "🔍",
+      icon: "https://images.unsplash.com/photo-1556155092-490a1ba16284?w=150&h=150&fit=crop&crop=center",
       gradient: "from-cyan-400 to-teal-600",
       backgroundImage: "https://picsum.photos/400/300?random=5",
       title: "Téléprospecteurs à distance",
       description: "Prospection commerciale efficace pour développer votre clientèle."
     },
     {
-      icon: "🎧",
+      icon: "https://images.unsplash.com/photo-1553484771-371a605b060b?w=150&h=150&fit=crop&crop=center",
       gradient: "from-purple-400 to-pink-600",
       backgroundImage: "https://picsum.photos/400/300?random=6",
       title: "Support client",
       description: "Assistance et accompagnement de vos clients avec professionnalisme."
     },
     {
-      icon: "📞",
+      icon: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=150&h=150&fit=crop&crop=center",
       gradient: "from-red-400 to-rose-600",
       backgroundImage: "https://picsum.photos/400/300?random=7",
       title: "Standardiste téléphonique",
       description: "Accueil téléphonique professionnel et gestion de vos appels."
     },
     {
-      icon: "🧮",
+      icon: "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=150&h=150&fit=crop&crop=center",
       gradient: "from-yellow-400 to-orange-600",
       backgroundImage: "https://picsum.photos/400/300?random=8",
       title: "Gestion financière en pré-compta",
       description: "Préparation et organisation de vos documents comptables."
     },
     {
-      icon: "🩺",
+      icon: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=150&h=150&fit=crop&crop=center",
       gradient: "from-emerald-400 to-green-600",
       backgroundImage: "https://picsum.photos/400/300?random=9",
       title: "Télésecrétaire médical",
       description: "Secrétariat spécialisé pour les professionnels de santé."
     },
     {
-      icon: "⚖️",
+      icon: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=150&h=150&fit=crop&crop=center",
       gradient: "from-slate-400 to-gray-600",
       backgroundImage: "https://picsum.photos/400/300?random=10",
       title: "Télésecrétaire juridique",
       description: "Support administratif spécialisé pour le secteur juridique."
     },
     {
-      icon: "💾",
+      icon: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=150&h=150&fit=crop&crop=center",
       gradient: "from-violet-400 to-purple-600",
       backgroundImage: "https://picsum.photos/400/300?random=11",
       title: "Saisie de données",
       description: "Saisie précise et rapide de vos données importantes."
     },
     {
-      icon: "🎙️",
+      icon: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=150&h=150&fit=crop&crop=center",
       gradient: "from-pink-400 to-red-600",
       backgroundImage: "https://picsum.photos/400/300?random=12",
       title: "Transcripteur audio et vidéo",
@@ -108,19 +108,19 @@ const ServicesSection = () => {
     }
   ];
 
-  const Icon3D = ({ emoji, gradient }) => (
-    <div className={`relative w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg group-hover:shadow-2xl`}>
+  const Icon3D = ({ iconUrl, gradient, title }) => (
+    <div className={`relative w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg group-hover:shadow-2xl overflow-hidden`}>
       <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent opacity-50"></div>
       <div className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-2xl bg-gradient-to-t from-black/20 to-transparent"></div>
       
-      <span 
-        className="text-2xl filter drop-shadow-lg transform transition-transform duration-300 group-hover:scale-110"
+      <img 
+        src={iconUrl}
+        alt={title}
+        className="w-14 h-14 object-cover rounded-lg transform transition-transform duration-300 group-hover:scale-110 shadow-lg"
         style={{
-          textShadow: '2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.2)'
+          filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3)) brightness(1.1) contrast(1.1)'
         }}
-      >
-        {emoji}
-      </span>
+      />
       
       <div className="absolute top-2 left-2 w-3 h-3 bg-white/40 rounded-full blur-sm"></div>
     </div>
@@ -183,7 +183,7 @@ const ServicesSection = () => {
               ></div>
               <div className="absolute inset-0 bg-gradient-to-br from-white/70 to-white/50 dark:from-gray-800/80 dark:to-gray-900/70"></div>
               <CardHeader className="text-center relative z-10">
-                <Icon3D emoji={service.icon} gradient={service.gradient} />
+                <Icon3D iconUrl={service.icon} gradient={service.gradient} title={service.title} />
                 <CardTitle className="text-lg font-bold text-gray-800 dark:text-gray-100 group-hover:text-vilo-purple-700 dark:group-hover:text-vilo-purple-300 transition-colors">
                   {service.title}
                 </CardTitle>
