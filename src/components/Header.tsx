@@ -1,21 +1,19 @@
+// ... imports identiques
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { Menu, X, Shield, Sparkles } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import UserMenu from './UserMenu';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, isLoading, isAdmin } = useAuth(); // Ajout de isLoading si nécessaire
+  const { user, isLoading, isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -44,7 +42,6 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
-  // Optionnel: Afficher un loader pendant le chargement
   if (isLoading) {
     return (
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-800">
@@ -56,10 +53,10 @@ const Header = () => {
   }
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-800' 
+        isScrolled
+          ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg border-b border-gray-200 dark:border-gray-800'
           : 'bg-transparent'
       }`}
     >
@@ -96,15 +93,18 @@ const Header = () => {
                 <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200"></span>
               </button>
             ))}
+
+          {/* Desktop Actions */}
+          <div className="hidden lg:flex items-left space-x-3">
+            <ThemeToggle />
+          </div>
+
           </nav>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center space-x-3 lg:hidden">
-            {/* {user ? <UserMenu /> : (
-              <Link to="/auth">
-                
-              </Link>
-            )} */}
+            {/* <ThemeToggle />
+            {user && <UserMenu />} */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 text-gray-700 dark:text-gray-300 hover:text-vilo-purple-600 dark:hover:text-vilo-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -127,9 +127,7 @@ const Header = () => {
                   {item.name}
                 </button>
               ))}
-              
-              {/* Mobile Admin Access */}
-              {/* {isAdmin && (
+              {isAdmin && (
                 <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                   <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
                     <div className="flex items-center px-4 py-3 text-base font-medium text-vilo-purple-600 dark:text-vilo-purple-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
@@ -138,7 +136,7 @@ const Header = () => {
                     </div>
                   </Link>
                 </div>
-              )} */}
+              )}
             </nav>
           </div>
         )}

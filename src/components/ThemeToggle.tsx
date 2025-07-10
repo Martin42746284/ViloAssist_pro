@@ -1,5 +1,5 @@
 
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/hooks/useTheme';
 
@@ -15,9 +15,11 @@ const ThemeToggle = () => {
       aria-label={isDark ? 'Activer le mode clair' : 'Activer le mode sombre'}
     >
       {isDark ? (
-        <Sun className="h-4 w-4 text-yellow-500" />
+        <Sparkles className="w-6 h-6 text-yellow-500" />
+        // <Sun className="h-4 w-4 text-yellow-500" />
       ) : (
-        <Moon className="h-4 w-4 text-gray-700" />
+        <Sparkles className="w-6 h-6 text-vilo-purple-200" />
+        // <Moon className="h-4 w-4 text-gray-700" />
       )}
     </Button>
   );
