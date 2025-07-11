@@ -122,25 +122,86 @@ router.get('/test-smtp', async (req, res) => {
 
 // Helper pour générer le contenu :personalisable
 function buildEmailContent(type, name, data) {
-  const base = {
-    subject: type === 'appointment'
-      ? 'Confirmation de votre rendez-vous - Vilo Assist'
-      : 'Réponse à votre demande de contact - Vilo Assist',
-    html: type === 'appointment'
-      ? `<p>Bonjour ${name},</p>
-         <p>Votre rendez-vous est confirmé pour le ${data?.date || 'date non spécifiée'} 
-         à ${data?.time || 'heure non spécifiée'}.</p>
-         <p>Merci de votre confiance.</p>`
-      : `<p>Bonjour ${name},</p>
-         <p>Nous avons bien reçu votre message : <b>${data?.message || ''}</b>
-         concernant le service <b>${data?.service || ''}</b>.</p>
-         <p>Nous vous répondrons rapidement.</p>`
+  let content = {
+    subject: '',
+    html: '',
+    text: ''
   };
 
-  // Version texte pour les clients email simples
-  base.text = base.html.replace(/<[^>]*>/g, '');
+  switch(type) {
+    case 'appointment-confirmation':
+      content.subject = `Confirmation de votre rendez-vous - Vilo Assist`;
+      content.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">Confirmation de rendez-vous</h2>
+          <p>Bonjour ${name},</p>
+          <p>Votre rendez-vous a été confirmé.</p>
+          
+          <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p style="margin: 0;"><strong>Date :</strong> ${data?.date || 'non spécifiée'}</p>
+            <p style="margin: 8px 0 0 0;"><strong>Heure :</strong> ${data?.time || 'non spécifiée'}</p>
+          </div>
 
-  return base;
+          <p>Merci de votre confiance.</p>
+          <p style="margin-top: 24px;">L'équipe Vilo Assist</p>
+        </div>
+      `;
+      break;
+
+    case 'appointment-cancellation':
+      content.subject = `Annulation de votre rendez-vous - Vilo Assist`;
+      content.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #dc2626;">Annulation de rendez-vous</h2>
+          <p>Bonjour ${name},</p>
+          <p>Nous vous informons que votre rendez-vous prévu le ${data?.date || 'date non spécifiée'} à ${data?.time || 'heure non spécifiée'} a été annulé.</p>
+          
+          <p style="color: #dc2626;">Nous sommes désolés pour ce contretemps.</p>
+          
+          <p>Vous pouvez prendre un nouveau rendez-vous en cliquant sur le lien suivant :</p>
+          <a href="https://votre-site.com/rendez-vous" style="display: inline-block; background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; margin: 8px 0;">Prendre un nouveau rendez-vous</a>
+          
+          <p style="margin-top: 24px;">L'équipe Vilo Assist</p>
+        </div>
+      `;
+      break;
+
+    case 'contact':
+      content.subject = `Réponse à votre demande de contact - Vilo Assist`;
+      content.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #2563eb;">Confirmation de réception</h2>
+          <p>Bonjour ${name},</p>
+          <p>Nous avons bien reçu votre message concernant le service <strong>${data?.service || 'non spécifié'}</strong> :</p>
+          
+          <div style="background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0;">
+            <p style="margin: 0; font-style: italic;">"${data?.message || ''}"</p>
+          </div>
+          
+          <p>Nous traitons votre demande et vous répondrons dans les plus brefs délais.</p>
+          <p style="margin-top: 24px;">L'équipe Vilo Assist</p>
+        </div>
+      `;
+      break;
+
+    default:
+      content.subject = `Notification - Vilo Assist`;
+      content.html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <p>Bonjour ${name},</p>
+          <p>Vous recevez ce message car une action a été effectuée sur votre compte.</p>
+          <p style="margin-top: 24px;">L'équipe Vilo Assist</p>
+        </div>
+      `;
+  }
+
+  // Version texte pour les clients email simples
+  content.text = content.html
+    .replace(/<[^>]*>/g, '') // Supprime les balises HTML
+    .replace(/\s{2,}/g, '\n') // Nettoie les espaces multiples
+    .trim();
+
+  return content;
 }
 
 // Test SMTP (à ajouter AVANT module.exports)

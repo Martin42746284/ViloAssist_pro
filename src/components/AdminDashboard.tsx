@@ -283,7 +283,7 @@ const AdminDashboard = () => {
   const sendEmailConfirmation = async (
     email: string, 
     name: string, 
-    type: 'contact' | 'appointment', 
+    type: 'contact' | 'appointment' |'appointment-confirmation' |'appointment-cancellation', 
     data?: any
   ) => {
     try {
@@ -335,22 +335,41 @@ const AdminDashboard = () => {
 
     // Helper functions
   const buildEmailText = (type: string, data: any): string => {
-    // Implémentez la version texte ici
-    return type === 'contact' 
-      ? `Nouveau message de ${data.nom || name}`
-      : `Rendez-vous confirmé pour le ${data.date || 'date non spécifiée'}`;
+    if (type === 'appointment-confirmation') {
+      return `Confirmation de rendez-vous\n\nBonjour ${data.name},\n\nNotre rendez-vous a été confirmé.\n\nDate: ${data.date}\nHeure: ${data.time}\n\nMerci de votre confiance.`;
+    } else if (type === 'appointment-cancellation') {
+      return `Annulation de rendez-vous\n\nBonjour ${data.name},\n\nNous vous informons que notre rendez-vous prévu le ${data.date} à ${data.time} a été annulé.\n\nNous sommes désolés pour ce contretemps.\n\nN'hésitez pas à prendre un nouveau rendez-vous.`;
+    }
+    // ... autres types d'emails
   };
 
   const buildEmailHtml = (type: string, data: any): string => {
-    // Implémentez la version HTML ici
-    return `
-      <html>
-        <body>
-          <h1>${type === 'contact' ? 'Nouveau contact' : 'Confirmation'}</h1>
-          <p>Détails : ${JSON.stringify(data)}</p>
-        </body>
-      </html>
-    `;
+    if (type === 'appointment-confirmation') {
+      return `
+        <html>
+          <body>
+            <h1>Confirmation de rendez-vous</h1>
+            <p>Bonjour ${data.name},</p>
+            <p>Votre rendez-vous pour le service <strong>${data.service}</strong> a été confirmé.</p>
+            <p>Date: <strong>${data.date}</strong></p>
+            <p>Heure: <strong>${data.time}</strong></p>
+            <p>Merci de votre confiance.</p>
+          </body>
+        </html>
+      `;
+    } else if (type === 'appointment-cancellation') {
+      return `
+        <html>
+          <body>
+            <h1>Annulation de rendez-vous</h1>
+            <p>Bonjour ${data.name},</p>
+            <p>Nous vous informons que votre rendez-vous pour le service <strong>${data.service}</strong> prévu le ${data.date} à ${data.time} a été annulé.</p>
+            <p>Nous sommes désolés pour ce contretemps.</p>
+            <p>N'hésitez pas à prendre un nouveau rendez-vous.</p>
+          </body>
+        </html>
+      `;
+    }
   };
 
   //Fonction pour la modification
@@ -402,16 +421,27 @@ const AdminDashboard = () => {
         api.put(`/admin/appointments/${id}`, { status })
       );
 
-      if (status === 'confirmé') {
-        const appointment = appointments.find(a => a.id === id);
-        if (appointment) {
+      // Envoyer email automatiquement selon le statut
+      const appointment = appointments.find(a => a.id === id);
+      if (appointment) {
+        if (status === 'confirmé') {
           await sendEmailConfirmation(
             appointment.client_email, 
             appointment.client_name, 
-            'appointment', 
+            'appointment-confirmation', // Nouveau type pour le template de confirmation
             {
               date: new Date(appointment.date).toLocaleDateString('fr-FR'),
-              time: appointment.time
+              time: appointment.time,
+            }
+          );
+        } else if (status === 'annulé') {
+          await sendEmailConfirmation(
+            appointment.client_email, 
+            appointment.client_name, 
+            'appointment-cancellation', // Nouveau type pour le template d'annulation
+            {
+              date: new Date(appointment.date).toLocaleDateString('fr-FR'),
+              time: appointment.time,
             }
           );
         }
@@ -419,7 +449,7 @@ const AdminDashboard = () => {
 
       toast({
         title: "Statut mis à jour",
-        description: "Le statut du rendez-vous a été modifié",
+        description: `Le rendez-vous a été ${status}${status === 'confirmé' || status === 'annulé' ? ' et un email a été envoyé au client' : ''}`,
       });
     } catch (error: any) {
       setAppointments(appointments);
@@ -744,19 +774,6 @@ const AdminDashboard = () => {
           Terminé
         </Button>
       )}
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => sendEmailConfirmation(appointment.client_email, appointment.client_name, 'appointment', {
-          date: new Date(appointment.date).toLocaleDateString('fr-FR'),
-          time: appointment.time
-        })}
-        disabled={confirmedEmails[appointment.client_email]}
-        className="border-indigo-300 text-indigo-600 hover:bg-indigo-50 dark:border-indigo-600 dark:text-indigo-400 dark:hover:bg-indigo-900/20"
-      >
-        <Send className="w-4 h-4 mr-1" />
-        {confirmedEmails[appointment.client_email] ? "Rendez-vous déjà confirmé" : "Envoyer email"}
-      </Button>
       <Button
         size="sm"
         variant="destructive"
