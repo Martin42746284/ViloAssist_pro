@@ -143,4 +143,50 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/appointments/:id - Supprimer un rendez-vous
+router.delete('/:id', async (req, res) => {
+  try {
+    const appointment = await Appointment.findByPk(req.params.id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rendez-vous non trouvé'
+      });
+    }
+
+    // Vérification si le rendez-vous peut être supprimé (optionnel)
+    if (appointment.status === 'confirmé') {
+      return res.status(400).json({
+        success: false,
+        message: 'Impossible de supprimer un rendez-vous confirmé. Veuillez d\'abord l\'annuler.'
+      });
+    }
+
+    await appointment.destroy();
+
+    res.json({
+      success: true,
+      message: 'Rendez-vous supprimé avec succès'
+    });
+
+  } catch (error) {
+    console.error('Erreur suppression rendez-vous:', error);
+    
+    // Gestion des erreurs spécifiques
+    if (error.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Impossible de supprimer ce rendez-vous car il est lié à d\'autres données'
+      });
+    }
+
+    res.status(500).json({ 
+      success: false, 
+      message: 'Erreur serveur lors de la suppression',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
 module.exports = router;
