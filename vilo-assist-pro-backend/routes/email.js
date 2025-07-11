@@ -159,7 +159,7 @@ function buildEmailContent(type, name, data) {
           <p style="color: #dc2626;">Nous sommes désolés pour ce contretemps.</p>
           
           <p>Vous pouvez prendre un nouveau rendez-vous en cliquant sur le lien suivant :</p>
-          <a href="https://votre-site.com/rendez-vous" style="display: inline-block; background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; margin: 8px 0;">Prendre un nouveau rendez-vous</a>
+          <a href="https://vilo-assist-pro-jet.vercel.app/" style="display: inline-block; background: #2563eb; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; margin: 8px 0;">Prendre un nouveau rendez-vous</a>
           
           <p style="margin-top: 24px;">L'équipe Vilo Assist</p>
         </div>
