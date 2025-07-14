@@ -42,73 +42,178 @@ const ChatWidget = () => {
     }
   }, [isTyping]);
 
-  // Réponses automatiques de l'IA
-  const getAIResponse = (userMessage: string): string => {
-    const msg = userMessage.toLowerCase();
+  // Fonction pour normaliser le texte et gérer les fautes de frappe
+  const normalizeText = (text: string): string => {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Enlever les accents
+      .replace(/[^a-z0-9\s]/g, ' ') // Remplacer la ponctuation par des espaces
+      .replace(/\s+/g, ' ') // Remplacer plusieurs espaces par un seul
+      .trim();
+  };
+
+  // Fonction pour calculer la distance de Levenshtein (similarité entre mots)
+  const levenshteinDistance = (str1: string, str2: string): number => {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
+  // Fonction pour vérifier si un mot est similaire à un mot clé
+  const isSimilar = (word: string, keyword: string, threshold: number = 2): boolean => {
+    if (word.includes(keyword) || keyword.includes(word)) return true;
+    if (Math.abs(word.length - keyword.length) > threshold) return false;
+    return levenshteinDistance(word, keyword) <= threshold;
+  };
+
+  // Fonction pour vérifier si le message contient des mots-clés similaires
+  const containsSimilarWords = (message: string, keywords: string[]): boolean => {
+    const normalizedMessage = normalizeText(message);
+    const words = normalizedMessage.split(' ');
     
-    // Salutations
-    if (msg.includes('bonjour') || msg.includes('salut') || msg.includes('hello')) {
+    return keywords.some(keyword => {
+      const normalizedKeyword = normalizeText(keyword);
+      return words.some(word => isSimilar(word, normalizedKeyword));
+    });
+  };
+
+  // Réponses automatiques de l'IA avec gestion des fautes de frappe
+  const getAIResponse = (userMessage: string): string => {
+    const msg = normalizeText(userMessage);
+    
+    // Salutations - avec variations et fautes de frappe
+    if (containsSimilarWords(msg, ['bonjour', 'bonsoir', 'bonne', 'salut', 'hello', 'hi', 'hey', 'coucou', 'bnjr', 'bjr', 'slt'])) {
       return 'Bonjour ! Je suis l\'assistant de VILO ASSIST-PRO. Comment puis-je vous aider aujourd\'hui ? 😊';
     }
     
-    // Présentation
-    if (msg.includes('qui êtes-vous') || msg.includes('vilo') || msg.includes('présentez')) {
+    // Présentation - avec variations
+    if (containsSimilarWords(msg, ['qui', 'etes', 'vous', 'vilo', 'presentez', 'presentation', 'entreprise', 'societe', 'compagnie', 'koi', 'ki', 'c\'est', 'cest'])) {
       return 'VILO ASSIST-PRO est votre assistant virtuel professionnel basé à Madagascar, spécialisé en support administratif et services de télésecrétariat depuis plus de 5 ans.';
     }
     
-    // Services
-    if (msg.includes('service') || msg.includes('offre') || msg.includes('prestation')) {
+    // Services - avec variations et fautes courantes
+    if (containsSimilarWords(msg, ['service', 'services', 'offre', 'offres', 'prestation', 'prestations', 'proposez', 'faites', 'specialite', 'competence', 'srvc', 'servic', 'ofre', 'presta'])) {
       return 'Nous proposons :\n- Assistant administratif\n- Support client\n- Télésecrétariat médical/juridique\n- Gestion pré-comptable\n- Transcription audio/vidéo\n- Saisie de données\n\nLequel vous intéresse ?';
     }
     
-    // Tarifs
-    if (msg.includes('prix') || msg.includes('tarif') || msg.includes('coût') || msg.includes('combien')) {
+    // Tarifs - avec variations et fautes courantes
+    if (containsSimilarWords(msg, ['prix', 'tarif', 'tarifs', 'cout', 'coute', 'combien', 'montant', 'budget', 'facturation', 'facturer', 'pri', 'tariff', 'cou', 'cbien', 'conbien'])) {
       return 'Notre tarif est de 10€/heure pour tous services. Exemple :\n10h/semaine = 400€/mois\n20h/semaine = 800€/mois\n\nBesoin d\'une estimation précise ?';
     }
     
-    // Contact
-    if (msg.includes('contact') || msg.includes('joindre') || msg.includes('appeler')) {
+    // Contact - avec variations
+    if (containsSimilarWords(msg, ['contact', 'contacter', 'joindre', 'appeler', 'telephone', 'email', 'mail', 'whatsapp', 'joindre', 'rdv', 'rendez', 'vous', 'kontak', 'kontakt', 'apeler', 'tel', 'numero'])) {
       return 'Vous pouvez nous contacter :\n📞 +261 33 21 787 85\n📧 info@viloassistpro.com\n💬 WhatsApp disponible\n\nSouhaitez-vous programmer un appel ?';
     }
     
-    // Délais
-    if (msg.includes('délai') || msg.includes('temps') || msg.includes('disponibilité')) {
+    // Délais - avec variations
+    if (containsSimilarWords(msg, ['delai', 'delais', 'temps', 'duree', 'disponibilite', 'disponible', 'quand', 'rapidement', 'vite', 'dlai', 'temp', 'dure', 'dispo', 'qand', 'kan'])) {
       return 'Nous intervenons sous 1-3 jours. Notre équipe est disponible du lundi au vendredi de 8h à 18h (GMT+3). Urgence ? Nous avons une option express !';
     }
     
-    // Confidentialité
-    if (msg.includes('confident') || msg.includes('sécurité') || msg.includes('données')) {
+    // Confidentialité - avec variations
+    if (containsSimilarWords(msg, ['confidentiel', 'confidentialite', 'securite', 'secure', 'donnees', 'protection', 'proteger', 'prive', 'secret', 'nda', 'konfidentiel', 'secu', 'donne', 'protec'])) {
       return 'Nous garantissons :\n- NDA systématique\n- Chiffrement des données\n- Accès sécurisé\n\nVos informations sont 100% protégées.';
     }
     
-    // Processus
-    if (msg.includes('process') || msg.includes('commencer') || msg.includes('démarrage')) {
+    // Processus - avec variations
+    if (containsSimilarWords(msg, ['processus', 'process', 'commencer', 'demarrer', 'demarrage', 'debut', 'etapes', 'procedure', 'comment', 'proses', 'comencer', 'demarer', 'debuter', 'koman'])) {
       return 'Notre processus :\n1. Appel découverte gratuit\n2. Proposition sur mesure\n3. Mise en place (1-3j)\n4. Lancement avec suivi\n\nIntéressé(e) ?';
     }
     
-    // Témoignages
-    if (msg.includes('client') || msg.includes('témoignage') || msg.includes('avis')) {
+    // Équipe & compétences - avec variations
+    if (containsSimilarWords(msg, ['equipe', 'team', 'competence', 'skill', 'formation', 'experience', 'personnel', 'assistant', 'qualification', 'ekip', 'kompetans', 'formasion', 'experians'])) {
+      return 'Notre équipe :\n• Assistants diplômés\n• Formation continue\n• Bilingues FR/EN\n• Spécialisations sectorielles\n• 5 ans d\'expérience moyenne';
+    }
+    
+    // Clients cibles - avec variations
+    if (containsSimilarWords(msg, ['client', 'clients', 'cible', 'target', 'pme', 'tpe', 'entrepreneur', 'professionnel', 'liberal', 'medecin', 'juriste', 'avocat', 'kliant', 'sib', 'profesionel'])) {
+      return 'Nos clients :\n• Entrepreneurs & TPE/PME\n• Professionnels libéraux\n• Cabinets médicaux/juridiques\n• Consultants indépendants\n• Startups en croissance';
+    }
+    
+    // Zone géographique - avec variations
+    if (containsSimilarWords(msg, ['zone', 'geographique', 'pays', 'france', 'europe', 'afrique', 'canada', 'suisse', 'belgique', 'luxembourg', 'international', 'geo', 'frans', 'zona'])) {
+      return 'Nous travaillons avec :\n• France & Europe francophone\n• Canada (Québec)\n• Afrique francophone\n• Fuseau horaire adapté (GMT+3)\n• Service 100% à distance';
+    }
+    
+    // Outils & technologies - avec variations
+    if (containsSimilarWords(msg, ['outil', 'outils', 'logiciel', 'technologie', 'plateforme', 'software', 'systeme', 'materiel', 'informatique', 'util', 'teknoloji', 'plataform', 'sistem'])) {
+      return 'Nos outils :\n• Suite Microsoft 365\n• Google Workspace\n• Logiciels métiers\n• CRM (Salesforce, HubSpot)\n• Outils de visio (Zoom, Teams)\n• Plateformes sécurisées';
+    }
+    
+    // Contrats & conditions - avec variations
+    if (containsSimilarWords(msg, ['contrat', 'condition', 'engagement', 'duree', 'resiliation', 'clause', 'facturation', 'paiement', 'modalite', 'garan', 'kondition', 'engajman', 'rezil'])) {
+      return 'Nos conditions :\n• Contrat flexible\n• Engagement mensuel\n• Facturation horaire ou forfait\n• Paiement sécurisé\n• Résiliation sous 15 jours\n• Essai gratuit possible';
+    }
+    
+    // Témoignages - avec variations
+    if (containsSimilarWords(msg, ['client', 'clients', 'temoignage', 'temoignages', 'avis', 'opinion', 'retour', 'satisfaction', 'reference', 'references', 'klient', 'temoin', 'avi', 'satisfac'])) {
       return 'Nos clients disent :\n"Professionnalisme remarquable" - Marie D.\n"Réactivité exceptionnelle" - Pierre M.\n98% de satisfaction !';
     }
     
-    // Urgence
-    if (msg.includes('urgent') || msg.includes('immédiat') || msg.includes('rapide')) {
+    // Avantages - avec variations
+    if (containsSimilarWords(msg, ['avantage', 'benefice', 'plus', 'valeur', 'choisir', 'difference', 'pourquoi', 'atout', 'force', 'avanta', 'benef', 'valer', 'poukoi'])) {
+      return 'Nos avantages :\n✓ Économie jusqu\'à 50%\n✓ Flexibilité horaire\n✓ Qualité premium\n✓ Réactivité 24h/24\n✓ Adaptabilité totale\n✓ Confidentialité absolue';
+    }
+    
+    // Évolution & adaptation - avec variations
+    if (containsSimilarWords(msg, ['evolution', 'changement', 'adapter', 'modifier', 'augmenter', 'reduire', 'volume', 'besoin', 'changement', 'evol', 'adapt', 'modif', 'chanjman'])) {
+      return 'Nous adaptons :\n• Changement d\'assistant\n• Augmentation volume\n• Réduction service\n• Nouveaux besoins\n• Spécialisation\n\nFlexibilité totale !';
+    }
+    
+    // Offres & promotions - avec variations
+    if (containsSimilarWords(msg, ['offre', 'promotion', 'reduction', 'remise', 'rabais', 'gratuit', 'essai', 'decouverte', 'preferentiel', 'of', 'promo', 'reduc', 'remis'])) {
+      return 'Offre spéciale :\n• 1ère heure offerte\n• -10% 20h+/mois\n• Essai 5h sans engagement\n\nDemandez votre devis personnalisé !';
+    }
+    
+    // Questions diverses - avec variations
+    if (containsSimilarWords(msg, ['autre', 'divers', 'question', 'info', 'information', 'document', 'site', 'web', 'reseau', 'social', 'blog', 'otr', 'kesion', 'enfo'])) {
+      return 'Plus d\'infos :\n🌐 www.viloassistpro.com\n📧 contact@viloassistpro.com\n📱 LinkedIn/Facebook\n\nAutre question ?';
+    }
+    
+    // Urgence - avec variations
+    if (containsSimilarWords(msg, ['urgent', 'urgence', 'immediat', 'immediate', 'rapide', 'rapidement', 'vite', 'emergency', 'urgen', 'imadiat', 'rapid', 'vit', 'emergensy'])) {
       return 'Pour les urgences :\n📞 +261 33 21 787 85 (dites "URGENT")\n⚡ Option express (+20%)\nDémarrage sous 24h !';
     }
     
-    // Merci
-    if (msg.includes('merci') || msg.includes('remercie')) {
+    // Remerciements - avec variations
+    if (containsSimilarWords(msg, ['merci', 'mercy', 'remercie', 'thanks', 'thank', 'remercier', 'mersi', 'mrc', 'thx', 'remerse'])) {
       return 'Je vous en prie ! 😊 Pour un conseiller humain : +261 33 21 787 85. ';
     }
     
-    // Au revoir
-    if (msg.includes('au revoir') || msg.includes('bye') || msg.includes('à bientôt')) {
+    // Au revoir - avec variations
+    if (containsSimilarWords(msg, ['au', 'revoir', 'aurevoir', 'bye', 'bientot', 'salut', 'ciao', 'tchao', 'goodbye', 'good', 'bye', 'revoire', 'biento', 'biento', 'byebye'])) {
       return 'Au revoir ! Merci d\'avoir choisi VILO ASSIST-PRO. Contactez-nous au +261 33 21 787 85 pour toute question.';
     }
+
+    // Aide générale - avec variations
+    if (containsSimilarWords(msg, ['aide', 'aider', 'help', 'assistance', 'support', 'soutien', 'aidez', 'moi', 'ed', 'assistans', 'suport', 'soutien'])) {
+      return 'Je suis là pour vous aider ! Je peux vous renseigner sur :\n• Nos services\n• Nos tarifs (10€/h)\n• Notre processus\n• Nos garanties\n\nQue souhaitez-vous savoir ?';
+    }
     
-    // Réponse par défaut
-    return 'Je n\'ai pas saisi votre demande. Voici ce que je peux expliquer :\n• Nos services\n• Nos tarifs (10€/h)\n• Notre processus\n• Nos garanties\n\nQuel sujet vous intéresse ?';
-};
+    // Réponse par défaut améliorée
+    return 'Je n\'ai pas bien compris votre demande. Voici ce que je peux vous expliquer :\n• Nos services et prestations\n• Nos tarifs (10€/h)\n• Notre processus de travail\n• Nos garanties de confidentialité\n• Comment nous contacter\n\nPouvez-vous reformuler votre question ?';
+  };
+
   const simulateTyping = async () => {
     setIsTyping(true);
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
