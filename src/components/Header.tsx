@@ -60,26 +60,34 @@ const Header = () => {
           : 'bg-transparent'
       }`}
     >
-      <div className="container mx-auto px-4 lg:px-6">
+      <div className="container mx-auto px-4 lg:px-6 py-1">
         <div className="flex items-center justify-between h-16 lg:h-18">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl flex items-center justify-center transform transition-transform group-hover:scale-105">
-                <img src="../public/favicon.ico" alt="" />
-                {/* <Sparkles className="w-6 h-6 text-white" /> */}
-              </div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 bg-clip-text text-transparent">
-                VILO ASSIST-PRO
-              </h1>
-              <p className="text-xs text-gray-600 dark:text-gray-400 -mt-1">
-                Assistance Virtuelle Professionnelle
-              </p>
-            </div>
-          </Link>
+  {/* Conteneur principal avec décalage vers le bas */}
+  <div className="relative top-0.5"> {/* Ajoutez top-1, top-2, top-3... selon le besoin */}
+    {/* Cadre du logo (déjà existant) */}
+    <div className="w-16 h-16 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl flex items-center justify-center overflow-hidden transform transition-transform group-hover:scale-105">
+      <img 
+        src="../public/Blue and White vintage School Logo.png" 
+        alt="Logo VILO ASSIST-PRO" 
+        className="w-full h-full object-cover rounded-xl"
+      />
+    </div>
+    {/* Effet d'ombre portée (gardez-le si nécessaire) */}
+    <div className="absolute -inset-1 bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+  </div>
+
+  {/* Texte à droite (inchangé) */}
+  <div className="hidden sm:block">
+    <h1 className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 bg-clip-text text-transparent">
+      VILO ASSIST-PRO
+    </h1>
+    <p className="text-xs text-gray-600 dark:text-gray-400 -mt-1">
+      Assistance Virtuelle Professionnelle
+    </p>
+  </div>
+</Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-1">

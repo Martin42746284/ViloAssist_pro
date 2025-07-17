@@ -1,4 +1,3 @@
-import { Check, Star } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useEffect, useRef } from 'react';
@@ -226,9 +225,15 @@ const PricingSection = () => {
             
             <CardHeader className="text-center pt-8">
               <div className="flex justify-center mb-4">
-                <div className="flex space-x-1">
+                <div className="flex space-x-2">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-6 h-6 fill-purple-600 text-purple-600 animate-pulse" style={{animationDelay: `${i * 0.1}s`}} />
+                    <img 
+                      key={i}
+                      src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?q=80&w=150&h=150&fit=crop"
+                      alt="Étoile"
+                      className="w-12 h-12 rounded-full object-cover brightness-110 saturate-150 animate-pulse shadow-lg"
+                      style={{animationDelay: `${i * 0.1}s`, filter: 'hue-rotate(280deg) brightness(1.2)'}}
+                    />
                   ))}
                 </div>
               </div>
@@ -256,10 +261,15 @@ const PricingSection = () => {
               <div className="space-y-4">
                 {benefits.map((benefit, index) => (
                   <div key={index} className="flex items-center space-x-3 slide-in hover-scale" style={{animationDelay: `${index * 0.1}s`}}>
-                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-r from-purple-900 to-pink-900 rounded-full flex items-center justify-center animate-pulse">
-                      <Check className="w-4 h-4 text-white" />
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden shadow-lg">
+                      <img 
+                        src="https://images.unsplash.com/photo-1622796406027-46bb04a6cc1c?q=80&w=150&h=150&fit=crop"
+                        alt="Validation"
+                        className="w-full h-full object-cover animate-pulse"
+                        style={{filter: 'hue-rotate(280deg) brightness(1.1) saturate(1.2)'}}
+                      />
                     </div>
-                    <span className="text-gray-800">{benefit}</span>
+                    <span className="text-gray-800 font-medium">{benefit}</span>
                   </div>
                 ))}
               </div>
@@ -291,22 +301,34 @@ const PricingSection = () => {
             </h3>
             <div className="grid md:grid-cols-3 gap-8">
               <div className="text-center slide-in hover-scale" style={{animationDelay: '0.2s'}}>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center animate-bounce">
-                  <span className="text-white text-2xl">💰</span>
+                <div className="w-28 h-28 rounded-2xl mx-auto mb-4 overflow-hidden animate-bounce shadow-xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=250&h=250&fit=crop"
+                    alt="Transparence"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="font-bold text-white mb-2">Transparence totale</h4>
                 <p className="text-gray-300">Aucun frais caché, aucune surprise. Un tarif clair et simple.</p>
               </div>
               <div className="text-center slide-in hover-scale" style={{animationDelay: '0.4s'}}>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center animate-bounce">
-                  <span className="text-white text-2xl">⚡</span>
+                <div className="w-28 h-28 rounded-2xl mx-auto mb-4 overflow-hidden animate-bounce shadow-xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=250&h=250&fit=crop"
+                    alt="Simplicité"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="font-bold text-white mb-2">Simplicité</h4>
                 <p className="text-gray-300">Un seul tarif pour tous nos services, facile à budgétiser.</p>
               </div>
               <div className="text-center slide-in hover-scale" style={{animationDelay: '0.6s'}}>
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl mx-auto mb-4 flex items-center justify-center animate-bounce">
-                  <span className="text-white text-2xl">🎯</span>
+                <div className="w-28 h-28 rounded-2xl mx-auto mb-4 overflow-hidden animate-bounce shadow-xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=250&h=250&fit=crop"
+                    alt="Qualité"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <h4 className="font-bold text-white mb-2">Qualité garantie</h4>
                 <p className="text-gray-300">Le même niveau d'excellence pour chaque mission.</p>

@@ -10,7 +10,7 @@ const Footer = () => {
   };
 
   const handleEmail = () => {
-    const email = 'manampisoa.m@zurcher.edu.mg';
+    const email = 'heritiana.l@zurcher.edu.mg';
     const subject = encodeURIComponent('Demande de contact');
     const body = encodeURIComponent('Bonjour,\n\nJe vous contacte depuis votre site web.\n\nCordialement,');
 
@@ -30,7 +30,6 @@ const Footer = () => {
   };
 
   useEffect(() => {
-    // Précharger la vidéo pour éviter les retards de chargement
     const video = document.createElement('video');
     video.src = '/videos/10915129-hd_3840_2160_30fps.mp4';
     video.load();
@@ -53,26 +52,34 @@ const Footer = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-black/70" />
       </div>
 
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Bloc 1 */}
-          <div className="space-y-4 bg-white/50 p-6 rounded-xl shadow-lg backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-6 relative z-10">
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Bloc 1 - À propos */}
+          <div className="space-y-3 bg-white/50 p-4 rounded-xl shadow-lg backdrop-blur-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center">
-                <span className="bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 bg-clip-text text-transparent font-bold text-lg">V</span>
+              <div className="w-12 h-12 bg-black rounded-xl overflow-hidden flex items-center justify-center">
+                <img 
+                  src="../public/Blue and White vintage School Logo.png" 
+                  alt="Logo VILO ASSIST-PRO" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <span className="text-xl font-bold text-gray-900">VILO ASSIST-PRO</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-800 via-violet-600 to-red-600 bg-clip-text text-transparent">
+                VILO ASSIST-PRO
+              </span>
             </div>
-            <p className="text-gray-800 leading-relaxed">
+            <p className="text-gray-800 leading-relaxed text-sm">
               Votre partenaire d'assistance virtuelle depuis Madagascar. 
               Plus de 5 ans d'expérience au service des professionnels francophones.
             </p>
           </div>
 
-          {/* Bloc 2 */}
-          <div className="space-y-4 bg-white/50 p-6 rounded-xl shadow-lg backdrop-blur-sm">
-            <h3 className="text-lg font-semibold text-gray-900">Nos Services</h3>
-            <div className="space-y-2 text-gray-800">
+          {/* Bloc 2 - Services */}
+          <div className="space-y-3 bg-white/50 p-4 rounded-xl shadow-lg backdrop-blur-sm">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-800 via-violet-600 to-red-600 bg-clip-text text-transparent">
+              Nos Services
+            </h3>
+            <div className="space-y-2 text-gray-800 text-sm">
               <p>• Assistant administratif</p>
               <p>• Support client</p>
               <p>• Télésecrétariat</p>
@@ -81,20 +88,22 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Bloc 3 */}
-          <div className="space-y-4 bg-white/50 p-6 rounded-xl shadow-lg backdrop-blur-sm">
-            <h3 className="text-lg font-semibold text-gray-900">Contact</h3>
-            <div className="space-y-3 text-gray-800">
+          {/* Bloc 3 - Contact */}
+          <div className="space-y-4 bg-white/50 p-5 rounded-xl shadow-lg backdrop-blur-sm">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-purple-800 via-violet-600 to-red-600 bg-clip-text text-transparent">
+              Contact
+            </h3>
+            <div className="space-y-2 text-gray-800 text-sm">
               <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-vilo-pink-600" />
-                <span>info@viloassistpro</span>
+                <Mail className="w-4 h-4 text-pink-600" />
+                <span>info@viloassistpro.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <MessageCircle className="w-5 h-5 text-vilo-pink-600" />
+                <MessageCircle className="w-4 h-4 text-pink-600" />
                 <span>+261 33 21 787 85</span>
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-vilo-pink-600 mt-0.5" />
+                <MapPin className="w-4 h-4 text-pink-600 mt-0.5" />
                 <span>
                   LOT IPF 023 Ambohijafy Bemasoandro<br />
                   Antananarivo, Madagascar
@@ -105,21 +114,21 @@ const Footer = () => {
         </div>
 
         {/* Bas de page */}
-        <div className="border-t border-gray-300 mt-8 pt-8 bg-white/50 p-6 rounded-xl shadow-md backdrop-blur-sm">
+        <div className="border-t border-gray-300 mt-6 pt-4 bg-white/50 p-4 rounded-xl shadow-md backdrop-blur-sm">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-center md:text-left text-gray-800">
-              © 2025 VILO ASSIST-PRO. Tous droits réservés.
+            <p className="text-center md:text-left text-gray-800 text-sm">
+              © {new Date().getFullYear()} VILO ASSIST-PRO. Tous droits réservés.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <button 
                 onClick={handleEmail}
-                className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg transition-colors text-sm text-gray-800"
+                className="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-lg transition-colors text-sm text-gray-800"
               >
                 Nous écrire
               </button>
               <button 
                 onClick={handleWhatsApp}
-                className="bg-gradient-to-r from-vilo-purple-600 to-vilo-pink-600 hover:from-vilo-purple-700 hover:to-vilo-pink-700 px-4 py-2 rounded-lg transition-colors text-sm text-white"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-3 py-2 rounded-lg transition-colors text-sm text-white"
               >
                 WhatsApp
               </button>
