@@ -1,32 +1,53 @@
 const express = require('express');
 const router = express.Router();
 const { Testimonial } = require('../models');
-const { validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 
-// POST /api/testimonials - Créer un nouveau témoignage
-router.post('/', async (req, res) => {
+
+// Middleware de validation
+const validateTestimonial = [
+  body('name')
+    .notEmpty().withMessage('Le nom est requis.')
+    .isLength({ min: 2, max: 100 }).withMessage('Le nom doit contenir entre 2 et 100 caractères.'),
+
+  body('post')
+    .notEmpty().withMessage('Le poste est requis.')
+    .isLength({ min: 2, max: 100 }).withMessage('Le poste doit contenir entre 2 et 100 caractères.'),
+
+  body('entreprise')
+    .notEmpty().withMessage("Le nom de l'entreprise est requis.")
+    .isLength({ min: 2, max: 100 }).withMessage("Le nom de l'entreprise doit contenir entre 2 et 100 caractères."),
+
+  body('comment')
+    .notEmpty().withMessage('Le commentaire est requis.')
+    .isLength({ min: 10 }).withMessage('Le commentaire doit contenir au moins 10 caractères.'),
+
+  body('rating')
+    .notEmpty().withMessage('La note est requise.')
+    .isInt({ min: 1, max: 5 }).withMessage('La note doit être un nombre entre 1 et 5.')
+];
+
+// Route POST 
+router.post('/', validateTestimonial, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, errors: errors.array() });
+    return res.status(400).json({
+      success: false,
+      message: 'Échec de validation.',
+      errors: errors.array()
+    });
   }
 
   try {
-    const { name, role, company, content, rating } = req.body;
-
-    if (!name || !role || !company || !content || !rating) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tous les champs sont obligatoires.'
-      });
-    }
+    const { name, post, entreprise, comment, rating } = req.body;
 
     const newTestimonial = await Testimonial.create({
       name,
-      role,
-      company,
-      content,
+      post,
+      entreprise,
+      comment,
       rating,
-      status: 'pending'
+      status: 'pending' // En attente de modération
     });
 
     res.status(201).json({
@@ -37,10 +58,11 @@ router.post('/', async (req, res) => {
 
   } catch (error) {
     console.error('Erreur création témoignage:', error);
+
     if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
         success: false,
-        message: 'Erreur de validation',
+        message: 'Erreur de validation côté base de données.',
         errors: error.errors.map(e => e.message)
       });
     }
@@ -57,7 +79,7 @@ router.post('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const testimonial = await Testimonial.findByPk(req.params.id, {
-      attributes: ['id', 'name', 'role', 'company', 'content', 'rating', 'status', 'createdAt']
+      attributes: ['id', 'name', 'post', 'entreprise', 'comment', 'rating', 'status', 'createdAt']
     });
 
     if (!testimonial) {
@@ -92,13 +114,13 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Témoignage non trouvé' });
     }
 
-    const { name, role, company, content, rating, status } = req.body;
+    const { name, post, entreprise, comment, rating, status } = req.body;
 
     const updates = {};
     if (name) updates.name = name;
-    if (role) updates.role = role;
-    if (company) updates.company = company;
-    if (content) updates.content = content;
+    if (post) updates.post = post;
+    if (entreprise) updates.entreprise = entreprise;
+    if (comment) updates.comment = comment;
     if (rating) updates.rating = rating;
     if (status) updates.status = status;
 
@@ -179,7 +201,7 @@ router.get('/', async (req, res) => {
     const testimonials = await Testimonial.findAll({
       where: { status: 'approved' },
       order: [['createdAt', 'DESC']],
-      attributes: ['id', 'name', 'role', 'company', 'content', 'rating', 'createdAt']
+      attributes: ['id', 'name', 'post', 'entreprise', 'comment', 'rating', 'createdAt']
     });
 
     res.json({ 
