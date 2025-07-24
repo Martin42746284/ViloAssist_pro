@@ -55,5 +55,13 @@ module.exports = (sequelize) => {
     timestamps: true
   });
 
+  Contact.associate = (models) => {
+    // Ajoutez cette association avec Appointment
+    Contact.hasMany(models.Appointment, {
+      foreignKey: 'contactId',
+      as: 'appointments'
+    });
+  };
+
   return Contact;
 };

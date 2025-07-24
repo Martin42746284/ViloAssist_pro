@@ -49,5 +49,19 @@ module.exports = (sequelize) => {
     timestamps: true
   });
 
+  Appointment.associate = (models) => {
+    Appointment.belongsTo(models.User, {
+      foreignKey: 'userId',
+      as: 'user'
+    });
+    
+    // Ajoutez cette association avec Contact
+    Appointment.belongsTo(models.Contact, {
+      foreignKey: 'contactId',
+      as: 'contact',
+      allowNull: true // Si le contact est optionnel
+    });
+  };
+
   return Appointment;
 };
