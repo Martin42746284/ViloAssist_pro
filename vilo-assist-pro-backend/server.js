@@ -12,18 +12,19 @@ const appointmentRoutes = require('./routes/appointments');
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const emailRoutes = require('./routes/email');
+const testimonialRoutes = require('./routes/testimonials'); // ✔️ Routes de témoignages
 
 const app = express();
 
 // ✅ CORS: liste des domaines autorisés
 const allowedOrigins = [
   'https://vilo-assist-pro-frontend.vercel.app',
-  'http://localhost:8080'
+  'http://localhost:8081'
 ];
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error(`CORS policy: origin ${origin} not allowed`));
@@ -34,6 +35,7 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use('/uploads', express.static('uploads'));
 
 // Middleware de logging en développement
 if (process.env.NODE_ENV === 'development') {
@@ -50,6 +52,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/admin', emailRoutes); // ✔️ Unifié sous /api/admin
 app.use('/api/contacts', contactRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use('/api/testimonials', testimonialRoutes); // ✔️ Routes de témoignages
 
 // ✅ Route de santé de l'API
 app.get('/api/health', (req, res) => {
